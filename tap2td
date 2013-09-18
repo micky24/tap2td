@@ -1,36 +1,49 @@
 #!/bin/bash
-# Script info, you entering option [0] Enter [q] to quit # Me, 'toekang' not giving any warranty &
-# Responsibility to anything! and to any damage on your system, so.. do it at your own risk.
-function p_i { echo; echo -e "\033[1;37m$1
-"; }; if [ $USER != 'root' ]; then echo "  Sorry, you need to run this script as root"; sleep 2; exit; fi
-if [ ! -f /etc/debian_version ]; then echo "  Only work on Debian-based systems."; sleep 2; exit; fi
-echo "$(grep address /etc/network/interfaces | grep -v 127.0.0.1  | awk '{print $2}' | grep -q '.' | head -1)"
-IP=$(grep address /etc/network/interfaces | grep -v 127.0.0.1  | awk '{print $2}' | grep '.' | head -1)
-p_i ""; clear; echo "################################################################################"
-echo "#          Welcome to Apache2 & Transmission-Daemon quick installer.           #"
-echo "#   No warranty to any damage \on your system, so.. do it at your own risk.    #"
-echo "################################################################################"; echo; p_i "   1) Un|Install Apa\
-che2 & Transmission-Daemon"; echo "   0) Script info ./tap2td"; echo; read -p "  Select an option [0-1/ctrl+c]: " -n 1 -\
-r option; case $option in 1)if [ -e /etc/transmission-daemon/settings.json ]; then echo ") Already installed"; echo; rea\
-d -p "  Uninstall Apache2 & Transmission-Daemon? [y/n]: " -n 1 -r; if [[ $REPLY =~ ^[Yy]$ ]]; then echo; service apache\
-2 stop; service transmission-daemon stop; apt-get -q -y remove --purge apache2 transmission-daemon
-dpkg -l | grep -i apache2 transmission-daemon; apt-get clean; apt-get autoremove -y; rm -rf ~/downloads; p_i "  Done Uni\
-nstalling Apache2 & Transmission-Daemon"; sleep 2; ./tap2td; else echo ") Aborting .."; sleep 2; ./tap2td; fi; fi; read \
--p ") Enter Apache2 port e.g.: " -e -i 909 PORT; echo; read -p "  Enter Transmission-Daemon port e.g.: " -e -i 9090 PORTT
-apt-get update; apt-get install apache2 transmission-daemon -y; apt-get remove --purge minissdpd\* -y; dpkg -l | grep -i\
- minissdpd; apt-get clean; apt-get autoremove -y; rm -rf /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default \
-/etc/transmission-daemon/settings.json; echo "NameVirtualHost *:$PORT
-Listen $PORT" > "/etc/apache2/ports.conf"; echo "<VirtualHost *:$PORT>ServerAdmin webmaster@localhost
-DocumentRoot /var/lib/transmission-daemon/downloads<Directory />Options FollowSymLinks
-AllowOverride None</Directory><Directory /var/lib/transmission-daemon/downloads/>Options Indexes FollowSymLinks MultiViews
-AllowOverride None
-Order allow,deny
-allow from all</Directory>ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/<Directory "/usr/lib/cgi-bin">AllowOverride None
-Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
-Order allow,deny
-Allow from all</Directory>ErrorLog ${APACHE_LOG_DIR}/error.log
-LogLevel warn
-CustomLog ${APACHE_LOG_DIR}/access.log combined</VirtualHost>" > "/etc/apache2/sites-enabled/transmission-daemon"
+#Enter [q] to quit, no warranty to any damage on your system, proceed at your own risk.
+if [ $USER != 'root' ]; then echo "Run as root"; sleep 2; exit; fi; if [ ! -f /etc/debian_version ]; then echo "Debian 6-7 only."; sleep 2; exit; fi; function p_i { echo; echo -e "\033[1;37m$1
+"; }; echo "$(grep address /etc/network/interfaces | grep -v 127.0.0.1  | awk '{print $2}' | grep -q '.' | head -1)"; IP=$(grep address /etc/network/interfaces | grep -v 127.0.0.1  | awk '{pr\
+int $2}' | grep '.' | head -1); p_i ""; clear; echo "################################################################################"; echo "#            Apache2 & Transmission-Daemon Quick \
+Installer Script.             #"; echo "#      No warranty to any damage on your system, proceed at your own risk.     #"; echo "##############################################################\
+##################"; echo; p_i "   1) Un|Install Apache2 & Transmission-Daemon      0) Script info ./tap2td"; echo; read -p "  Select an option [0-1]|[ctrl+c]: " -n 1 -r option; case $option \
+in 1)if [ -e /etc/transmission-daemon/settings.json ]; then echo ") Already installed"; echo; read -p "  Uninstall Apache2 & Transmission-Daemon? [y/n]: " -n 1 -r; if [[ $REPLY =~ ^[Yy]$ ]]
+then echo; service apache2 stop; service transmission-daemon stop; apt-get -q -y remove --purge apache2 transmission-daemon; dpkg -l | grep -i apache2 transmission-daemon; apt-get clean all
+apt-get autoremove -y; rm -rf ~/downloads; p_i "  Done Uninstalling Apache2 & Transmission-Daemon"; sleep 2; ./tap2td; else echo ") Aborting .."; sleep 2; ./tap2td; fi; fi; read -p ") Enter A\
+pache2 port e.g.: " -e -i 909 PORT; echo; read -p "  Enter Transmission-Daemon port e.g.: " -e -i 9090 PORTT; apt-get update; apt-get install apache2 transmission-daemon -y; apt-get remove --\
+purge minissdpd\* -y; dpkg -l | grep -i minissdpd; apt-get clean; apt-get autoremove -y; rm -rf /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default /etc/transmission-daemon/setting\
+s.json; 12=/etc/apache2/ports.conf; echo "NameVirtualHost *:$PORT" > "$12"; echo "Listen $PORT" >> "$12"; cat > /etc/apache2/sites-available/transmission-daemon <<END
+<VirtualHost *:$PORT>
+	ServerAdmin webmaster@localhost
+
+	DocumentRoot /var/lib/transmission-daemon/downloads/
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride None
+	</Directory>
+	<Directory /var/lib/transmission-daemon/downloads/>
+		Options Indexes FollowSymLinks MultiViews
+		AllowOverride None
+		Order allow,deny
+		allow from all
+	</Directory>
+
+	ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+	<Directory "/usr/lib/cgi-bin">
+		AllowOverride None
+		Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+		Order allow,deny
+		Allow from all
+	</Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+END
+ln -s /etc/apache2/sites-available/transmission-daemon /etc/apache2/sites-enable/transmission-daemon 
 chmod 555 /etc/apache2/sites-enabled/transmission-daemon; cat > /etc/transmission-daemon/settings.json <<END
 {
     "alt-speed-down": 50, 
@@ -103,14 +116,7 @@ chmod 555 /etc/apache2/sites-enabled/transmission-daemon; cat > /etc/transmissio
     "utp-enabled": true
 }
 END
-chmod 555 /etc/transmission-daemon/settings.json; cd /etc/transmission-daemon; chmod 600 settings.json; chown debian-tra\
-nsmission:debian-transmission settings.json; cd ~; ln -s /var/lib/transmission-daemon/downloads; service apache2 restart
-service transmission-daemon reload; clear; p_i "  Done, Apache2 & Transmission-Daemon installed
-  Apache2 running on $IP:$PORT
-  Transmission-Daemon running on $IP:$PORTT
-  User: $PORT
-  Password: $PORTT"; read -p  "  Back to main [enter]: " ./tap2td
-;; 0)apt-get install less -y; cat ~/tap2td | less; ./tap2td
-;; esac 
-echo "  Can't find that option .."; sleep 3; ./tap2td
-done
+chmod 555 /etc/transmission-daemon/settings.json; cd /etc/transmission-daemon; chmod 600 settings.json; chown debian-transmission:debian-transmission settings.json; cd ~; ln -s /var/lib/trans\
+mission-daemon/downloads; service apache2 restart; service transmission-daemon reload; echo; echo "  Done, Apache2 & Transmission-Daemon installed."; echo  "  Apache2 running at $IP:$PORT, Tr\
+ansmission-Daemon running at $IP:$PORTT"; echo "  Authentication: $PORT|$PORTT"; echo; read -p  "  Back to main [enter]: "; cd ~; ./tap2td;; 0)apt-get install less -y; cat ~/tap2td | less; ./\
+tap2td;; esac; echo "  Can't find that option .."; sleep 3; ./tap2td done
