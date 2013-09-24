@@ -6,7 +6,7 @@ int $2}' | grep '.' | head -1); p_i ""; clear; echo "###########################
 Installer Script.             #"; echo "#      No warranty to any damage on your system, proceed at your own risk.     #"; echo "##############################################################\
 ##################"; echo; p_i "   1) Un|Install Apache2 & Transmission-Daemon      0) Script info ./tap2td"; echo; read -p "  Select an option [0-1]|[ctrl+c]: " -n 1 -r option; case $option \
 in 1)if [ -e /etc/transmission-daemon/settings.json ]; then echo ") Already installed"; echo; read -p "  Uninstall Apache2 & Transmission-Daemon? [y/n]: " -n 1 -r; if [[ $REPLY =~ ^[Yy]$ ]]
-then echo; service apache2 stop; service transmission-daemon stop; apt-get -q -y remove --purge apache2 transmission-daemon; dpkg -l | grep -i apache2 transmission-daemon; apt-get clean all
+then echo; service apache2 stop; service transmission-daemon stop; apt-get -q -y remove --purge apache2\* transmission-daemon\*; dpkg -l | grep -i apache2 transmission-daemon; apt-get clean
 apt-get autoremove -y; rm -rf ~/downloads; p_i "  Done Uninstalling Apache2 & Transmission-Daemon"; sleep 2; ./tap2td; else echo ") Aborting .."; sleep 2; ./tap2td; fi; fi; read -p ") Enter A\
 pache2 port e.g.: " -e -i 909 PORT; echo; read -p "  Enter Transmission-Daemon port e.g.: " -e -i 9090 PORTT; apt-get update; apt-get install apache2 transmission-daemon -y; apt-get remove --\
 purge minissdpd\* -y; dpkg -l | grep -i minissdpd; apt-get clean; apt-get autoremove -y; rm -rf /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default /etc/transmission-daemon/setting\
