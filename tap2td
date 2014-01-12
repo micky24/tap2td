@@ -1,5 +1,6 @@
 #!/bin/bash
-#Enter [q] to quit, no warranty to any damage on your system, proceed at your own risk.
+## wget --no-check-certificate raw.github.com/toekang/tap2td/master/tap2td; chmod 100 tap2td; ./tap2td
+## Enter [q] to quit, no warranty to any damage on your system, proceed at your own risk.
 if [ $USER != 'root' ]; then echo "Run as root"; sleep 2; exit; fi; if [ ! -f /etc/debian_version ]; then echo "Debian 6-7 only."; sleep 2; exit; fi; function p_i { echo; echo -e "\033[1;37m$1
 "; }; echo "$(grep address /etc/network/interfaces | grep -v 127.0.0.1  | awk '{print $2}' | grep -q '.' | head -1)"; 
 IP=$(grep address /etc/network/interfaces | grep -v 127.0.0.1  | awk '{print $2}' | grep '.' | head -1); p_i ""; 
